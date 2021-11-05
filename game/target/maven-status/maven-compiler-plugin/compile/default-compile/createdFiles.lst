@@ -1,0 +1,8 @@
+game\utils\Parameters.class
+game\api\Game.class
+game\utils\JWTUtils.class
+game\utils\Secrets.class
+game\api\AtomicIntger.class
+game\api\Api.class
+game\api\Gamer.class
+game\api\GameServices.class
