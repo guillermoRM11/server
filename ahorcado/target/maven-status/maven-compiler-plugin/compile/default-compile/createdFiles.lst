@@ -1,0 +1,7 @@
+ahorcado\api\Api.class
+ahorcado\utiils\Secrets.class
+ahorcado\utiils\Parameters.class
+ahorcado\api\Game.class
+ahorcado\api\Player.class
+ahorcado\utiils\TokenUtils.class
+ahorcado\api\User.class
