@@ -1,0 +1,10 @@
+marsattack\utils\ResponseCodes.class
+marsattack\api\addScore.class
+marsattack\utils\Parameters.class
+marsattack\api\getScores.class
+marsattack\utils\Db.class
+marsattack\db\Score.class
+marsattack\utils\DbPool.class
+marsattack\utils\Response.class
+marsattack\utils\Secrets.class
+marsattack\api\Api.class
