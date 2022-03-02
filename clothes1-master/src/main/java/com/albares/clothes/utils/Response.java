@@ -11,6 +11,9 @@ public class Response {
     private Integer responseCode;
     private List<Product> products;
 
+    public Response() {
+    }
+    
     public Integer getResponseCode() {
         return responseCode;
     }
@@ -26,6 +29,7 @@ public class Response {
     public void setProducts(List<Product> products) {
         this.products = products;
     }
+    
     
     
     

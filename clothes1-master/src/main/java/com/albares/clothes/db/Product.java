@@ -2,16 +2,18 @@
 package com.albares.clothes.db;
 
 import com.albares.clothes.utils.Db;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.albares.clothes.utils.ResponseCodes;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.security.NoSuchAlgorithmException;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
+@JsonInclude(Include.NON_NULL)
 public class Product {
     
     private Integer id;
@@ -19,11 +21,52 @@ public class Product {
     private Integer price;
     private Integer stock;
     private Integer gender;
-    
+    private Integer brand_id;
+        
+    //No DB
     private Integer quantity;
-    
-    public Product(){}
+    private Brand brand;
 
+    public Brand getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Brand brand) {
+        this.brand = brand;
+    }
+
+    
+    
+    public Product(Integer id, String name, Integer price, Integer stock, Integer gender, Integer brand_id) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.stock = stock;
+        this.gender = gender;
+        this.brand_id = brand_id;
+    }
+
+    
+    
+    public Product() {
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Integer getBrand_id() {
+    return brand_id;
+    }
+
+    public void setBrand_id(Integer brand_id) {
+    this.brand_id = brand_id;
+    }
+    
     public Integer getId() {
         return id;
     }
@@ -63,111 +106,151 @@ public class Product {
     public void setGender(Integer gender) {
         this.gender = gender;
     }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
     
     
-
-    @Override
-    public String toString() {
-        return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", stock=" + stock + ", gender=" + gender + '}';
-    }
     
     
-    public void insertProducts_DB(Db myDb) throws SQLException, NoSuchAlgorithmException {
+    public void insertProduct_DB(Db myDb) throws SQLException{
         PreparedStatement ps = myDb.prepareStatement(
-                "INSERT INTO products (id, name, price, stock, gender) VALUES (?, ?, ?, ?, ?);"
-        );
-        ps.setInt(1, this.getId());
-        ps.setString(2, this.getName());
-        ps.setInt(3, this.getPrice());
-        ps.setInt(4, this.getStock());
-        ps.setInt(5, this.getStock());
+                    "INSERT INTO products (name, price, stock, gender, brand_id) VALUES (?, ?, ?, ?, ?);"
+            );
+        ps.setString(1, this.getName());
+        ps.setInt(2, this.getPrice());
+        ps.setInt(3, this.getStock());
+        ps.setInt(4, this.getGender());
+        ps.setInt(5, this.getBrand_id());
+        ps.executeUpdate();
         
-        myDb.executUpdate(ps);
     }
     
-    public static List selectProducts_DB(Db myDb) throws SQLException{
+    
+    public static List selectAllProducts_DB(Db myDb) throws SQLException{
         PreparedStatement ps = myDb.prepareStatement(
-                "SELECT id, name, price, stock, gender FROM products;"
-        );
+                    "SELECT id,name,price,stock,gender,brand_id FROM products;"
+            );
+        
         ResultSet rs = myDb.executeQuery(ps);
+        List<Product> products = new ArrayList();
         
-        List <Product> myProducts = new ArrayList();
         while(rs.next()){
-            Product product = new Product();
-            product.setId(rs.getInt(1));
-            product.setName(rs.getString(2));
-            product.setPrice(rs.getInt(3));
-            product.setStock(rs.getInt(4));
-            product.setGender(rs.getInt(5));
-            myProducts.add(product);
+    
+            Product product = new Product(
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getInt(4),
+                    rs.getInt(5),
+                    rs.getInt(6)
+            );
+            products.add(product);
         }
-        return myProducts;
+        return products;
     }
     
-    public static void sellProducts(Db myDb, Integer id, Integer quantity) throws SQLException{
+    public static List selectAllProductsGender_DB(Db myDb,int gender) throws SQLException{
         PreparedStatement ps = myDb.prepareStatement(
-                "UPDATE products SET stock = ? WHERE id = ?;"
-        );
-        ps.setInt(1, Product.selectStock_DB(myDb, id) - quantity);
-        ps.setInt(2, id);
-        
-        myDb.executUpdate(ps);
-    }
-    
-    public static Integer selectStock_DB(Db myDb, Integer id) throws SQLException {        
-        PreparedStatement ps = myDb.prepareStatement(
-                "SELECT stock FROM products WHERE id = ?;"
-        );
-        ps.setInt(1, id);
-        ResultSet rs = myDb.executeQuery(ps);
-        
-        rs.next();
-        Integer stock= rs.getInt(1);
-        return stock;
-        
-    }
-    
-    public static List selectProductsByGender_DB(Db myDb, Integer gender) throws SQLException{
-        PreparedStatement ps = myDb.prepareStatement(
-                "SELECT id, name, price, stock, gender FROM products WHERE gender = ?;"
-        );
-        
+                    "SELECT p.id,p.name,p.price,p.stock,p.gender,p.brand_id, b.id, b.name, b.origin FROM products p, brands b WHERE p.gender = ?;"
+            );
         ps.setInt(1, gender);
         ResultSet rs = myDb.executeQuery(ps);
+        List<Product> products = new ArrayList();
         
-        List <Product> myProducts = new ArrayList();
         while(rs.next()){
-            Product product = new Product();
-            product.setId(rs.getInt(1));
-            product.setName(rs.getString(2));
-            product.setPrice(rs.getInt(3));
-            product.setStock(rs.getInt(4));
-            product.setGender(rs.getInt(5));
-            myProducts.add(product);
+ 
+            Product product = new Product(
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getInt(4),
+                    rs.getInt(5),
+                    rs.getInt(6)
+            );
+            Brand brand = new Brand(
+                    rs.getInt(7),
+                    rs.getString(8),
+                    rs.getString(9)
+            );
+            product.setBrand(brand);
+            products.add(product);
         }
-        return myProducts;
+        return products;
+    }
+
+    public int buyProduct_DB(Db myDb) throws SQLException {
+        PreparedStatement ps = myDb.prepareStatement(
+                    "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ? ;"
+            );
+        ps.setInt(1, this.getQuantity());
+        ps.setInt(2, this.getId());
+        ps.setInt(3, this.getQuantity());
+        if(ps.executeUpdate()==0){
+            return ResponseCodes.OUT_OF_STOCK;
+        }else{
+            return ResponseCodes.OK;
+        }
+    }
+
+    public void editProduct_DB(Db myDb) throws SQLException {
+        String update = "UPDATE products SET ";
+        List<String> fields = new ArrayList();
+        if(this.getName()!=null) fields.add("name");
+        if(this.getGender()!=null) fields.add("gender");
+        if(this.getStock()!=null) fields.add("stock");
+        if(this.getPrice()!=null) fields.add("price");
+        if(this.getBrand_id()!=null) fields.add("brand_id");
+        for (int i = 0; i < fields.size(); i++){
+            update += fields.get(i)+"= ?";
+            if(i!=fields.size()-1) update += ",";
+        }
+        update +=  " where id = ?;";
+        PreparedStatement ps = myDb.prepareStatement(update);
+        for (int i = 0; i < fields.size(); i++){
+            switch(fields.get(i)){
+                case "name":
+                    ps.setString(i+1, this.getName());
+                    break;
+                case "gender":
+                    ps.setInt(i+1, this.getGender());
+                    break;
+                case "stock":
+                    ps.setInt(i+1, this.getStock());
+                    break;
+                case "price":
+                    ps.setInt(i+1, this.getPrice());
+                    break;
+                case "brand_id":
+                    ps.setInt(i+1, this.getBrand_id());
+                    break;
+            }
+        }
+        ps.setInt(fields.size()+1, this.getId());
+        ps.executeUpdate();
     }
     
-    public void updateProduct(Db myDb) throws SQLException{
+        public static List selectAllProductsBrand_DB(Db myDb,int brand_id) throws SQLException{
         PreparedStatement ps = myDb.prepareStatement(
-                "UPDATE products SET id = ?, name = ?, price = ?, stock = ?, gender = ? WHERE id = ?;"
-        );
-        ps.setInt(1, this.getId());
-        ps.setString(2, this.getName());
-        ps.setInt(3, this.getPrice());
-        ps.setInt(4, this.getStock());
-        ps.setInt(5, this.getGender());
-        ps.setInt(6, this.getId());
+                    "SELECT id,name,price,stock,gender,brand_id FROM products WHERE brand_id = ?;"
+            );
+        ps.setInt(1, brand_id);
+        ResultSet rs = myDb.executeQuery(ps);
+        List<Product> products = new ArrayList();
         
-        myDb.executUpdate(ps);
-        
+        while(rs.next()){
+            
+            Product product = new Product(
+                    rs.getInt(1),
+                    rs.getString(2),
+                    rs.getInt(3),
+                    rs.getInt(4),
+                    rs.getInt(5),
+                    rs.getInt(6)
+            );
+            Brand brand = new Brand();
+            brand.setBrand_id(rs.getInt(6));
+            product.setBrand(brand);
+            products.add(product);
+        }
+        return products;
     }
+
 }
