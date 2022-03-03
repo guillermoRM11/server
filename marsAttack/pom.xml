@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>albares.basic</groupId>
-    <artifactId>basic</artifactId>
+    <artifactId>guillermoCancer</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>marsAttack</name>
+    <name>guillermoCancer</name>
     <inceptionYear>2021</inceptionYear>
 
     <properties>
@@ -57,7 +57,7 @@
 
 
     <build>
-        <finalName>basic</finalName>
+        <finalName>guillermoCancer</finalName>
         <plugins>
             <plugin>
             <groupId>org.apache.tomee.maven</groupId>
